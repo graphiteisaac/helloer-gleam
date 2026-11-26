@@ -1,9 +1,13 @@
-FROM erlang:29.0.0.0-alpine AS build
-COPY --from=ghcr.io/gleam-lang/gleam:v1.17.0-erlang-alpine /bin/gleam /bin/gleam
+ARG ERL_VERSION=29.1.3.0-alpine
+ARG GLEAM_VERSION=1.19.2-erlang-alpine
+
+FROM ghcr.io/gleam-lang/gleam:v${GLEAM_VERSION} AS gleam
+FROM erlang:${ERL_VERSION} AS build
+COPY --from=gleam /bin/gleam /bin/gleam
 COPY . /app/
 RUN cd /app && gleam export erlang-shipment
 
-FROM erlang:29.0.0.0-alpine
+FROM erlang:${ERL_VERSION}
 RUN \
   addgroup --system helloer && \
   adduser --system helloer -g helloer
